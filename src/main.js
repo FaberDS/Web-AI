@@ -20,6 +20,8 @@ let inputLanguage = normalizeLang("de");
 let targetLanguage = normalizeLang("en");
 let lastSource = null;
 
+let detectedOk = false;
+
 function optionLabel({ flag, name }, availability) {
   return availability === "downloadable"
     ? `${flag} ${name} ⬇`
@@ -68,6 +70,7 @@ async function refreshTargetLanguageOptions({ sourceLanguage }) {
   if ([...langSelect.options].some((o) => o.value === selected)) {
     langSelect.value = selected;
   }
+  updateTranslateEnabled();
 }
 
 async function detectLanguage(text) {
@@ -95,7 +98,10 @@ translateInputElement.addEventListener("input", async (e) => {
       inputLanguage = detectedBase;
       if (window.Translator)
         await refreshTargetLanguageOptions({ sourceLanguage: inputLanguage });
+      detectedOk = true;
     }
+  } else {
+    detectedOk = false;
   }
 });
 
@@ -137,10 +143,22 @@ async function translateStreaming(text, options) {
 }
 
 triggerTranslate.addEventListener("click", async () => {
+  if (!detectedOk) {
+    setStatus("Cannot translate: language not detected.");
+    return;
+  }
+
+  const availability = getSelectedAvailability();
+  if (availability === "unavailable") {
+    setStatus("Cannot translate: selected language pair not supported.");
+    return;
+  }
+
   const options = {
     sourceLanguage: inputLanguage,
     targetLanguage: targetLanguage,
   };
+
   await translateStreaming(translateInputElement.value, options);
 });
 
@@ -150,6 +168,7 @@ await refreshTargetLanguageOptions({ sourceLanguage: inputLanguage });
 langSelect.value = targetLanguage;
 langSelect.addEventListener("change", (e) => {
   targetLanguage = normalizeLang(e.target.value);
+  updateTranslateEnabled();
 });
 
 translateInputElement?.addEventListener("input", () => {
@@ -219,4 +238,14 @@ if (!isChromeLike()) {
   showBrowserWarning(
     "Chrome detected, but Translator/LanguageDetector APIs are not available. Ensure you are on a compatible Chrome version and a secure context (https or localhost).",
   );
+}
+
+function getSelectedAvailability() {
+  const opt = langSelect.selectedOptions?.[0];
+  return opt?.dataset?.availability ?? "unavailable";
+}
+
+function updateTranslateEnabled() {
+  const availability = getSelectedAvailability();
+  triggerTranslate.disabled = !detectedOk || availability === "unavailable";
 }
