@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/<REPO_NAME>/",
+    "build": "vite build --base=/Web-AI/",
     "preview": "vite preview"
   },
   "devDependencies": {
