@@ -86,23 +86,35 @@ clearBtn?.addEventListener("click", () => {
 
 translateInputElement.addEventListener("input", async (e) => {
   const text = e.target.value;
+
+  if (!text.trim()) {
+    detectedOk = false;
+    detectedLanguageElement.innerHTML = "";
+    updateTranslateEnabled();
+    return;
+  }
+
   const results = await detectLanguage(text);
   const first = results?.[0];
 
-  if (first?.confidence > 0.5 && first.detectedLanguage) {
+  const ok = !!(first?.confidence > 0.5 && first?.detectedLanguage);
+  detectedOk = ok;
+
+  if (ok) {
     const detectedBase = normalizeLang(first.detectedLanguage);
     detectedLanguageElement.innerHTML = languageToFlag(detectedBase);
 
     if (detectedBase !== lastSource) {
       lastSource = detectedBase;
       inputLanguage = detectedBase;
-      if (window.Translator)
+      if (window.Translator) {
         await refreshTargetLanguageOptions({ sourceLanguage: inputLanguage });
-      detectedOk = true;
+      }
     }
   } else {
     detectedOk = false;
   }
+  updateTranslateEnabled();
 });
 
 async function translateStreaming(text, options) {
