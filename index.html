@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/ico" href="favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>01-language-detector</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <main class="wrap">
+      <div id="browserWarning" class="warning" hidden>
+        These features require Google Chrome (built-in on-device AI). In this
+        browser, language detection/translation may not work.
+      </div>
+      <section class="card">
+        <div class="row">
+          <h1>Translate</h1>
+          <button id="clearTranslationInput" class="muted">clear</button>
+        </div>
+
+        <textarea id="translateInput" rows="6"></textarea>
+        <div class="row">
+          <div class="pair">
+            <label for="langSelect">Translate to:</label>
+            <select id="langSelect"></select>
+          </div>
+
+          <div class="end-of-row">
+            <span class="detail-value" id="wordCount">0</span> Words
+            <span class="detail-value" id="detectedLanguage"></span>
+          </div>
+        </div>
+        <div class="row">
+          <button id="triggerTranslate" type="button" class="full-w">
+            Translate
+          </button>
+          <span id="translateStatus" class="muted" hidden>Translating…</span>
+          <div id="modelProgress" class="muted" hidden>
+            <progress id="modelProgressBar" value="0" max="100"></progress>
+            <span id="modelProgressText"></span>
+          </div>
+        </div>
+        <div class="out" aria-live="polite">
+          <p id="translatedOutput"></p>
+        </div>
+      </section>
+    </main>
+    <footer>Build with ❤️ and uses in browser 🤖</footer>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
